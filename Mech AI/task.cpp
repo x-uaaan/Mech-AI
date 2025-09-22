@@ -121,8 +121,8 @@ int main() {
         int n=1;
         cout << n++ << ". Add a Task\n";
         cout << n++ << ". Complete a Task\n";
-        cout << n++ << ". View Tasks in List\n";
-        cout << n++ << ". View Tasks in Plot\n";
+        cout << n++ << ". Display Tasks in List\n";
+        cout << n++ << ". Display Tasks in Plot\n";
         cout << n++ << ". Exit\n";
         cout << "Choose an option: ";
         cin >> choice;

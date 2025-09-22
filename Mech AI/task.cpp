@@ -23,6 +23,19 @@ struct Task {
     Date dueDate;
 };
 
+void printTasks(const vector<Task>& tasks) {
+    cout << "\nYour Tasks:" << endl;
+    if (tasks.empty()) {
+        cout << "No tasks" << endl;
+        return;
+    }
+    for (size_t i = 0; i < tasks.size(); i++) {
+        cout << i + 1 << ". " << tasks[i].description 
+             << " | Due: " << tasks[i].dueDate.toString()
+             << (tasks[i].completed ? " (Completed)" : " (Pending)") << endl;
+    }
+}
+
 bool isValidDate(int day, int month, int year) {
     if (year < 2024 || month < 1 || month > 12 || day < 1) return false;
     
@@ -67,7 +80,7 @@ int main() {
         cin >> choice;
 
         if (choice == 1) {
-            cout << "Enter task and due date: ";
+            cout << "Enter task: ";
             cin.ignore();
             getline(cin, newTask.description);
             newTask.completed = false;
@@ -76,22 +89,33 @@ int main() {
             cout << "Task added successfully with due date: " << newTask.dueDate.toString() << endl;
         } 
         else if (choice == 2) {
-            cout << "\nYour Tasks:" << endl;
-            for (size_t i = 0; i < tasks.size(); i++) {
-                cout << i + 1 << ". " << tasks[i].description 
-                     << " | Due: " << tasks[i].dueDate.toString()
-                     << (tasks[i].completed ? " (Completed)" : " (Pending)") << endl;
-            }
-            if (tasks.empty()) cout << "No tasks yet" << endl;
+            printTasks(tasks);
         } 
         else if (choice == 3) {
-            cout << "Enter task number to mark as completed: ";
-            cin >> taskNum;
-            if (taskNum > 0 && static_cast<size_t>(taskNum) <= tasks.size()) {
-                tasks[static_cast<size_t>(taskNum) - 1].completed = true;
-                cout << "Task completed!" << endl;
-            } else {
-                cout << "Invalid task number!" << endl;
+            // Show the current tasks first
+            printTasks(tasks);
+            if (!tasks.empty()) {
+                while (true) {
+                    cout << "Enter task number to mark as completed: ";
+                    cin >> taskNum;
+                    if (cin.fail()) {
+                        cout << "Invalid input! Please enter a number." << endl;
+                        cin.clear();
+                        cin.ignore(10000, '\n');
+                        // Reprint tasks for clarity before retry
+                        printTasks(tasks);
+                        continue;
+                    }
+                    if (taskNum > 0 && static_cast<size_t>(taskNum) <= tasks.size()) {
+                        tasks[static_cast<size_t>(taskNum) - 1].completed = true;
+                        cout << "Task completed!" << endl;
+                        break;
+                    } else {
+                        cout << "Invalid task number! Please choose between 1 and " << tasks.size() << "." << endl;
+                        // Reprint tasks for clarity before retry
+                        printTasks(tasks);
+                    }
+                }
             }
         }
         else if (choice == 4) {

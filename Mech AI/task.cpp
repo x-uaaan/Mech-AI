@@ -5,12 +5,6 @@
 #include <sstream>
 using namespace std;
 
-struct Task {
-    string description;
-    bool completed;
-    Date dueDate;
-};
-
 struct Date {
     int day, month, year;
     
@@ -23,8 +17,16 @@ struct Date {
     }
 };
 
+struct Task {
+    string description;
+    bool completed;
+    Date dueDate;
+};
+
 bool isValidDate(int day, int month, int year) {
-    if (year < 2024 || month < 1 || month > 12 || day < 1) return false;
+    const int MIN_YEAR = 2025;
+    const int MAX_YEAR = 2030; // 5 years from 2025 inclusive
+    if (year < MIN_YEAR || year > MAX_YEAR || month < 1 || month > 12 || day < 1) return false;
     
     int daysInMonth[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
     
@@ -65,19 +67,19 @@ void printTasks(const vector<Task>& tasks) {
 }
 
 void visualizeStatus(const vector<Task>& tasks) {
+    cout << "\nTask Status Plot" << endl;
+    cout << "----------------" << endl;
+
+    if (tasks.empty()) {
+        cout << "No tasks to plot" << endl << endl;
+        return;
+    }
+
     size_t completedCount = 0;
-    cout << "\nYour Tasks:" << endl;
     for (const Task& t : tasks) {
-        cout << "\nTask Status Plot" << endl;
-        cout << "----------------" << endl;
         if (t.completed) completedCount++;
     }
     size_t pendingCount = tasks.size() - completedCount;
-
-    if (tasks.empty()) {
-        cout << "No tasks" << endl << endl;
-        return;
-    }
 
     // Determine max height for the bars
     size_t maxVal = max(completedCount, pendingCount);
@@ -103,7 +105,7 @@ void visualizeStatus(const vector<Task>& tasks) {
     }
     cout << "   +----+---+" << endl;
     cout << "     C     P" << endl;
-    cout << endl << " Total=" << tasks.size() << ", Completed=" << completedCount << ", Pending=" << pendingCount << endl << endl;
+    cout << endl << "Total=" << tasks.size() << ", Completed=" << completedCount << ", Pending=" << pendingCount << endl << endl;
 }
 
 int main() {

@@ -5,6 +5,12 @@
 #include <sstream>
 using namespace std;
 
+struct Task {
+    string description;
+    bool completed;
+    Date dueDate;
+};
+
 struct Date {
     int day, month, year;
     
@@ -16,67 +22,6 @@ struct Date {
         return ss.str();
     }
 };
-
-struct Task {
-    string description;
-    bool completed;
-    Date dueDate;
-};
-
-void printTasks(const vector<Task>& tasks) {
-    cout << "\nYour Tasks:" << endl;
-    if (tasks.empty()) {
-        cout << "No tasks" << endl << endl;
-        return;
-    }
-    for (size_t i = 0; i < tasks.size(); i++) {
-        cout << i + 1 << ". " << tasks[i].description 
-             << " | Due: " << tasks[i].dueDate.toString()
-             << (tasks[i].completed ? " (Completed)" : " (Pending)") << endl;
-    }
-    cout << endl;
-}
-
-void visualizeStatus(const vector<Task>& tasks) {
-    cout << "\nTask Status Plot" << endl;
-    cout << "----------------" << endl;
-    size_t completedCount = 0;
-    for (const Task& t : tasks) {
-        if (t.completed) completedCount++;
-    }
-    size_t pendingCount = tasks.size() - completedCount;
-
-    if (tasks.empty()) {
-        cout << "No tasks to plot" << endl;
-        return;
-    }
-
-    // Determine max height for the bars
-    size_t maxVal = max(completedCount, pendingCount);
-    size_t maxHeight = min<size_t>(maxVal, 10); // cap to 10 rows for readability
-
-    auto scaledHeight = [&](size_t v) -> size_t {
-        if (maxVal == 0) return 0;
-        double ratio = static_cast<double>(v) / static_cast<double>(maxVal);
-        size_t h = static_cast<size_t>(ratio * maxHeight + 0.5);
-        return h;
-    };
-
-    size_t hC = scaledHeight(completedCount);
-    size_t hP = scaledHeight(pendingCount);
-
-    // Draw from top to bottom
-    for (size_t row = maxHeight; row > 0; --row) {
-        cout << setw(2) << row << " | ";
-        cout << (hC >= row ? "##" : "  ") << "   "
-             << (hP >= row ? "##" : "  ")
-             << endl;
-    }
-    cout << "   +----+---+" << endl;
-    cout << "     C     P" << endl;
-    cout << "C=" << completedCount << ", P=" << pendingCount << 
-            " (Total=" << tasks.size() << ")" << endl;
-}
 
 bool isValidDate(int day, int month, int year) {
     if (year < 2024 || month < 1 || month > 12 || day < 1) return false;
@@ -103,6 +48,62 @@ Date inputDate() {
     } while (!isValidDate(date.day, date.month, date.year));
     
     return date;
+}
+
+void printTasks(const vector<Task>& tasks) {
+    cout << "\nYour Tasks:" << endl;
+    if (tasks.empty()) {
+        cout << "No tasks" << endl << endl;
+        return;
+    }
+    for (size_t i = 0; i < tasks.size(); i++) {
+        cout << i + 1 << ". " << tasks[i].description 
+             << " | Due: " << tasks[i].dueDate.toString()
+             << (tasks[i].completed ? " (Completed)" : " (Pending)") << endl;
+    }
+    cout << endl;
+}
+
+void visualizeStatus(const vector<Task>& tasks) {
+    size_t completedCount = 0;
+    cout << "\nYour Tasks:" << endl;
+    for (const Task& t : tasks) {
+        cout << "\nTask Status Plot" << endl;
+        cout << "----------------" << endl;
+        if (t.completed) completedCount++;
+    }
+    size_t pendingCount = tasks.size() - completedCount;
+
+    if (tasks.empty()) {
+        cout << "No tasks" << endl << endl;
+        return;
+    }
+
+    // Determine max height for the bars
+    size_t maxVal = max(completedCount, pendingCount);
+    size_t maxHeight = min<size_t>(maxVal, 10); // cap to 10 rows for readability
+
+    auto scaledHeight = [&](size_t v) -> size_t {
+        if (maxVal == 0) return 0;
+        double ratio = static_cast<double>(v) / static_cast<double>(maxVal);
+        size_t h = static_cast<size_t>(ratio * maxHeight + 0.5);
+        return h;
+    };
+
+    size_t hC = scaledHeight(completedCount);
+    size_t hP = scaledHeight(pendingCount);
+
+    // Draw from top to bottom
+    for (size_t row = maxHeight; row > 0; --row) {
+        cout << setw(2) << row << " | ";
+        // Use fixed-width cells so columns stay aligned
+        cout << (hC >= row ? "# " : "  ") << "   "
+             << (hP >= row ? "# " : "  ")
+             << endl;
+    }
+    cout << "   +----+---+" << endl;
+    cout << "     C     P" << endl;
+    cout << endl << " Total=" << tasks.size() << ", Completed=" << completedCount << ", Pending=" << pendingCount << endl << endl;
 }
 
 int main() {
@@ -183,9 +184,6 @@ int main() {
         }
         else if (choice == 5) {
             cout << "Exiting MECH AI Assistant. Stay productive!" << endl;
-        }
-        else {
-            cout << "Invalid option, Please try again!" << endl;
         }
     } while (choice != 5);
 
